@@ -6,7 +6,6 @@ package org.uci.ics.project;
  */
 public class MapCoordinateGenerator
 {
-
     public static void main( String[] args )
     {
         System.out.println( "Hello World!" );
