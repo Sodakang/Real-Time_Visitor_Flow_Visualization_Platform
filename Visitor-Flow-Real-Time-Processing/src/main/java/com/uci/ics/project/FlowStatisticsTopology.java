@@ -43,30 +43,38 @@ public class FlowStatisticsTopology {
         topologyBuilder.setSpout(KafkaSpout.class.getSimpleName(), new KafkaSpout(spoutConfig));
         topologyBuilder.setBolt(LogProcessBolt.class.getName(), new LogProcessBolt())
                 .shuffleGrouping(KafkaSpout.class.getSimpleName());
-        topologyBuilder.setBolt(LocationCountBolt.class.getName(), new LocationCountBolt())
+//        topologyBuilder.setBolt(LocationCountBolt.class.getName(), new LocationCountBolt())
+//                .shuffleGrouping(LogProcessBolt.class.getName());
+
+        JedisPoolConfig jedisPoolConfigForRead = new JedisPoolConfig.Builder()
+                .setHost(properties.getProperty("CoordinateRedisHost"))
+                .setPort(Integer.parseInt(properties.getProperty("CoordinateHostPort")))
+                .build();
+        topologyBuilder.setBolt(RedisCoordinateReadBolt.class.getName(),
+                new RedisCoordinateReadBolt(jedisPoolConfigForRead))
                 .shuffleGrouping(LogProcessBolt.class.getName());
 
         // Connect to Redis
-        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig.Builder()
-                .setHost(properties.getProperty("RedisHost"))
-                .setPort(Integer.parseInt(properties.getProperty("RedisHostPort")))
+        JedisPoolConfig jedisPoolConfigForStore = new JedisPoolConfig.Builder()
+                .setHost(properties.getProperty("StoreRedisHost"))
+                .setPort(Integer.parseInt(properties.getProperty("StoreRedisHostPort")))
                 .build();
-        RedisVisitorsStoreBolt redisVisitorsStoreBolt = new RedisVisitorsStoreBolt(jedisPoolConfig);
-        topologyBuilder.setBolt(RedisVisitorsStoreBolt.class.getName(), new RedisVisitorsStoreBolt(jedisPoolConfig))
-                .shuffleGrouping(LocationCountBolt.class.getName());
+        topologyBuilder.setBolt(RedisVisitorsStoreBolt.class.getName(),
+                new RedisVisitorsStoreBolt(jedisPoolConfigForStore))
+//                .shuffleGrouping(LocationCountBolt.class.getName());
+                .shuffleGrouping(RedisCoordinateReadBolt.class.getName());
 
         // Submit the topology into a Storm cluster.
-//        String topologyName = FlowStatisticsTopology.class.getSimpleName();
-//        try {
-//            StormSubmitter.submitTopology(topologyName,new Config(), topologyBuilder.createTopology());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
+        String topologyName = FlowStatisticsTopology.class.getSimpleName();
+        try {
+            StormSubmitter.submitTopology(topologyName,new Config(), topologyBuilder.createTopology());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // Submit the topology into local cluster.
-        LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("FlowStatisticsTopology",
-                new Config(), topologyBuilder.createTopology());
+//        LocalCluster cluster = new LocalCluster();
+//        cluster.submitTopology("FlowStatisticsTopology",
+//                new Config(), topologyBuilder.createTopology());
 
     }
 }

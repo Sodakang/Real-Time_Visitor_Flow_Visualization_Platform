@@ -26,7 +26,8 @@ public class LogProcessBolt extends BaseRichBolt {
         String[] temp = splits[1].split(",");
         String latitude = temp[0], longitude = temp[1];
         String time = splits[2];
-        return new String[] {time, latitude, longitude};
+        String latency = splits[3];
+        return new String[] {time, latitude, longitude, latency};
     }
 
     @Override
@@ -41,10 +42,10 @@ public class LogProcessBolt extends BaseRichBolt {
         String[] logs = processLog(value);
         try {
             long time = DateUtils.getInstance().getTime(logs[0]);
-            String latitude = logs[1], longitude = logs[2];
-            System.out.println(time + "," + latitude + "," + longitude);
+            String latitude = logs[1], longitude = logs[2], latency = logs[3];
+            System.out.println(time + "," + latitude + "," + longitude + "," + latency);
             // outputCollector.emit(new Values(time, Double.parseDouble(latitude), Double.parseDouble(longitude)));
-            outputCollector.emit(new Values(time, latitude, longitude));
+            outputCollector.emit(new Values(time, latitude, longitude, latency));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,6 +58,6 @@ public class LogProcessBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("time", "latitude", "longitude"));
+        outputFieldsDeclarer.declare(new Fields("time", "latitude", "longitude", "latency"));
     }
 }

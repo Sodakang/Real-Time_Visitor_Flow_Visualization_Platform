@@ -33,7 +33,7 @@ public class LocationController {
     public String showVisitorFlow(Model model) {
         List<Location> locations = locationService.findAll();
         JSONArray jsonArray = JSONArray.fromObject(locations);
-        System.out.println(jsonArray);
+        // System.out.println(jsonArray);
         model.addAttribute("location_json", jsonArray);
         return "VisitorsFlowMap";
     }

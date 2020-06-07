@@ -12,6 +12,7 @@ import java.util.Map;
 
 /**
  * The bolt for count the visitors in a location.
+ * It is given up.
  */
 public class LocationCountBolt extends BaseRichBolt {
 
