@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.uci.ics.project</groupId>
 	<artifactId>real_time_flow_visualization_web</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>real_time_flow_visualization_web</name>
 	<description>Website Front-End for Real-Time Flow Visualization</description>
 
@@ -62,8 +62,21 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>1.4.2.RELEASE</version>
+				<configuration>
+					<mainClass>com.uci.ics.project.real_time_flow_visualization_web.RealTimeFlowVisualizationWebApplication</mainClass>
+				</configuration>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>${basedir}/src/main/webapp</directory>
+				<targetPath>META-INF/resources</targetPath>
+				<includes>
+				<include>**/**</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 
 </project>

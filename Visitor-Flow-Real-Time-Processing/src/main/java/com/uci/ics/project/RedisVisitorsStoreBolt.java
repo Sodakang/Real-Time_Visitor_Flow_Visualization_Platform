@@ -40,12 +40,18 @@ public class RedisVisitorsStoreBolt extends AbstractRedisBolt {
             // If the key does not exist, the value of key will be initialized as 0, and set the key as persistent.
             jedisCommands.incr(key);
             String visits = jedisCommands.get(key);
-            if(visits.equals("1")) {  // If the key exists for the first time, we need to set the expire time.
-                jedisCommands.expire(key, Integer.parseInt(properties.getProperty("EXPIRE_TIME_IN_SECONDS")));
-            } else if(StringUtils.isEmpty(visits)) {  //If the key is timeout.
+            if(StringUtils.isEmpty(visits)) {  // If the key is timeout.
                 jedisCommands.incr(key);
                 jedisCommands.expire(key, Integer.parseInt(properties.getProperty("EXPIRE_TIME_IN_SECONDS")));
+            } else if(visits.equals("1")) {  // If the key exists for the first time, we need to set the expire time.
+                jedisCommands.expire(key, Integer.parseInt(properties.getProperty("EXPIRE_TIME_IN_SECONDS")));
             }
+//            if(visits.equals("1")) {  // If the key exists for the first time, we need to set the expire time.
+//                jedisCommands.expire(key, Integer.parseInt(properties.getProperty("EXPIRE_TIME_IN_SECONDS")));
+//            } else if(StringUtils.isEmpty(visits)) {  //If the key is timeout.
+//                jedisCommands.incr(key);
+//                jedisCommands.expire(key, Integer.parseInt(properties.getProperty("EXPIRE_TIME_IN_SECONDS")));
+//            }
             this.collector.ack(tuple);
         }catch (Exception e) {
             this.collector.reportError(e);

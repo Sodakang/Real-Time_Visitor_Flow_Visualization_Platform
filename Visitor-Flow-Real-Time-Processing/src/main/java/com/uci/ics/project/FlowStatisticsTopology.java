@@ -40,7 +40,7 @@ public class FlowStatisticsTopology {
         // The operations for reading the offset.
         spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
-        topologyBuilder.setSpout(KafkaSpout.class.getSimpleName(), new KafkaSpout(spoutConfig));
+        topologyBuilder.setSpout(KafkaSpout.class.getSimpleName(), new KafkaSpout(spoutConfig), 2);
         topologyBuilder.setBolt(LogProcessBolt.class.getName(), new LogProcessBolt())
                 .shuffleGrouping(KafkaSpout.class.getSimpleName());
 //        topologyBuilder.setBolt(LocationCountBolt.class.getName(), new LocationCountBolt())
@@ -66,8 +66,10 @@ public class FlowStatisticsTopology {
 
         // Submit the topology into a Storm cluster.
         String topologyName = FlowStatisticsTopology.class.getSimpleName();
+        Config config = new Config();
+        config.setNumWorkers(6);
         try {
-            StormSubmitter.submitTopology(topologyName,new Config(), topologyBuilder.createTopology());
+            StormSubmitter.submitTopology(topologyName, config, topologyBuilder.createTopology());
         } catch (Exception e) {
             e.printStackTrace();
         }
